@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand: #6b0f1a;
+  --color-brand-dark: #4f0b14;
+  --color-cream: #f5e9da;
+  --color-cream-bg: #fff9f2;
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+}
+
+body {
+  @apply bg-cream-bg text-stone-900 antialiased;
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+}
