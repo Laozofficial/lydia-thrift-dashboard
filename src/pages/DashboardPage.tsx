@@ -27,12 +27,12 @@ export function DashboardPage() {
   return (
     <div>
       <PageHeader title="Dashboard" subtitle="Overview of Lydia's Thrift platform" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
         {tiles.map((tile) => (
           <Link key={tile.label} to={tile.to}>
-            <Card className="p-6 transition hover:border-brand/40 hover:shadow-md">
+            <Card className="p-5 transition active:scale-[0.99] sm:p-6 sm:hover:border-brand/40 sm:hover:shadow-md">
               <p className="text-sm font-medium text-stone-500">{tile.label}</p>
-              <p className="mt-2 text-3xl font-bold text-brand">{tile.value}</p>
+              <p className="mt-2 text-2xl font-bold text-brand sm:text-3xl">{tile.value}</p>
               {tile.sub ? <p className="mt-1 text-xs text-stone-500">{tile.sub}</p> : null}
             </Card>
           </Link>

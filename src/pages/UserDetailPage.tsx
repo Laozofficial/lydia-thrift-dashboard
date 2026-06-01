@@ -4,7 +4,19 @@ import { Link, useParams } from 'react-router-dom';
 import { blockUser, getUser, listUserEnrollments, unblockUser, updateUser, updateUserWallet } from '../api/admin';
 import { ApiError, formatFieldErrors, formatNaira } from '../api/client';
 import type { Enrollment, User } from '../api/types';
-import { Alert, Badge, Button, Card, Input, Label, PageHeader, PasswordInput } from '../components/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Input,
+  Label,
+  MobileCard,
+  MobileCardRow,
+  PageHeader,
+  PasswordInput,
+  TableScroll,
+} from '../components/ui';
 
 export function UserDetailPage() {
   const { id } = useParams();
@@ -95,14 +107,20 @@ export function UserDetailPage() {
         title={user?.name ?? 'User'}
         subtitle={user?.email}
         action={
-          <div className="flex gap-2">
-            <Link to="/users">
-              <Button variant="outline">Back</Button>
+          <>
+            <Link to="/users" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full">
+                Back
+              </Button>
             </Link>
-            <Button variant={user?.is_blocked ? 'outline' : 'danger'} onClick={toggleBlock}>
+            <Button
+              variant={user?.is_blocked ? 'outline' : 'danger'}
+              onClick={toggleBlock}
+              className="w-full sm:w-auto"
+            >
               {user?.is_blocked ? 'Unblock' : 'Block user'}
             </Button>
-          </div>
+          </>
         }
       />
 
@@ -161,35 +179,54 @@ export function UserDetailPage() {
         </Card>
       </div>
 
-      <Card className="mt-6 overflow-hidden">
-        <div className="border-b border-stone-200 px-4 py-3">
-          <h2 className="font-semibold">Plans ({enrollments.length})</h2>
+      <div className="mt-6">
+        <h2 className="mb-3 font-semibold">Plans ({enrollments.length})</h2>
+        <div className="flex flex-col gap-3 md:hidden">
+          {enrollments.map((e) => (
+            <MobileCard key={e.id}>
+              <p className="mb-2 font-semibold">{e.product?.name}</p>
+              <MobileCardRow label="Status">
+                <span className="capitalize">{e.status}</span>
+              </MobileCardRow>
+              <MobileCardRow label="Total">{formatNaira(e.total_naira)}</MobileCardRow>
+              <Link
+                to={`/enrollments/${e.id}`}
+                className="mt-3 flex min-h-[44px] items-center justify-center text-sm font-semibold text-brand"
+              >
+                View plan →
+              </Link>
+            </MobileCard>
+          ))}
         </div>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-cream/50 text-xs uppercase text-stone-500">
-            <tr>
-              <th className="px-4 py-2">Product</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Total</th>
-              <th className="px-4 py-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {enrollments.map((e) => (
-              <tr key={e.id} className="border-t border-stone-100">
-                <td className="px-4 py-3">{e.product?.name}</td>
-                <td className="px-4 py-3 capitalize">{e.status}</td>
-                <td className="px-4 py-3">{formatNaira(e.total_naira)}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link to={`/enrollments/${e.id}`} className="font-semibold text-brand hover:underline">
-                    Details
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+        <Card className="hidden overflow-hidden md:block">
+          <TableScroll>
+            <table className="w-full min-w-[480px] text-left text-sm">
+              <thead className="bg-cream/50 text-xs uppercase text-stone-500">
+                <tr>
+                  <th className="px-4 py-2">Product</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Total</th>
+                  <th className="px-4 py-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {enrollments.map((e) => (
+                  <tr key={e.id} className="border-t border-stone-100">
+                    <td className="px-4 py-3">{e.product?.name}</td>
+                    <td className="px-4 py-3 capitalize">{e.status}</td>
+                    <td className="px-4 py-3">{formatNaira(e.total_naira)}</td>
+                    <td className="px-4 py-3 text-right">
+                      <Link to={`/enrollments/${e.id}`} className="font-semibold text-brand hover:underline">
+                        Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableScroll>
+        </Card>
+      </div>
     </div>
   );
 }

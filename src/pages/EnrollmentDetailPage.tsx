@@ -5,7 +5,20 @@ import { getEnrollment, updateEnrollmentDelivery } from '../api/admin';
 import { formatNaira } from '../api/client';
 import type { Enrollment } from '../api/types';
 import { deliveryBadgeTone, DELIVERY_STATUS_OPTIONS } from '../utils/delivery';
-import { Alert, Badge, Button, Card, Input, Label, PageHeader, Textarea } from '../components/ui';
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Input,
+  Label,
+  MobileCard,
+  MobileCardRow,
+  PageHeader,
+  Select,
+  TableScroll,
+  Textarea,
+} from '../components/ui';
 
 export function EnrollmentDetailPage() {
   const { id } = useParams();
@@ -77,8 +90,10 @@ export function EnrollmentDetailPage() {
         title={enrollment.product?.name ?? 'Plan'}
         subtitle={`Enrollment #${enrollment.id}`}
         action={
-          <Link to="/enrollments">
-            <Button variant="outline">Back to queue</Button>
+          <Link to="/enrollments" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full">
+              Back to queue
+            </Button>
           </Link>
         }
       />
@@ -133,20 +148,16 @@ export function EnrollmentDetailPage() {
         {enrollment.status !== 'completed' ? (
           <Alert>Shipping can be managed after all installments are paid.</Alert>
         ) : (
-          <form onSubmit={handleSaveShipping} className="grid gap-4 md:grid-cols-2">
+          <form onSubmit={handleSaveShipping} className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <Label>Delivery status</Label>
-              <select
-                value={deliveryStatus}
-                onChange={(e) => setDeliveryStatus(e.target.value)}
-                className="w-full border border-stone-300 px-3 py-2.5 text-sm outline-none focus:border-brand"
-              >
+              <Select value={deliveryStatus} onChange={(e) => setDeliveryStatus(e.target.value)}>
                 {DELIVERY_STATUS_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             <div>
               <Label>Carrier</Label>
@@ -178,7 +189,7 @@ export function EnrollmentDetailPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" disabled={saving} className="w-full md:w-auto">
                 {saving ? 'Saving…' : 'Save shipping details'}
               </Button>
             </div>
@@ -186,29 +197,45 @@ export function EnrollmentDetailPage() {
         )}
       </Card>
 
-      <Card className="mt-6 overflow-hidden">
-        <div className="border-b border-stone-200 px-4 py-3 font-semibold">Payment schedule</div>
-        <table className="w-full text-left text-sm">
-          <thead className="bg-cream/50 text-xs uppercase text-stone-500">
-            <tr>
-              <th className="px-4 py-2">#</th>
-              <th className="px-4 py-2">Due</th>
-              <th className="px-4 py-2">Amount</th>
-              <th className="px-4 py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(enrollment.payment_schedules ?? []).map((s) => (
-              <tr key={s.id} className="border-t border-stone-100">
-                <td className="px-4 py-2">{s.sequence}</td>
-                <td className="px-4 py-2">{new Date(s.due_at).toLocaleDateString()}</td>
-                <td className="px-4 py-2">{formatNaira(s.amount_naira)}</td>
-                <td className="px-4 py-2 capitalize">{s.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+      <div className="mt-6">
+        <h2 className="mb-3 font-semibold">Payment schedule</h2>
+        <div className="flex flex-col gap-2 md:hidden">
+          {(enrollment.payment_schedules ?? []).map((s) => (
+            <MobileCard key={s.id}>
+              <p className="mb-2 font-semibold">Payment #{s.sequence}</p>
+              <MobileCardRow label="Due">{new Date(s.due_at).toLocaleDateString()}</MobileCardRow>
+              <MobileCardRow label="Amount">{formatNaira(s.amount_naira)}</MobileCardRow>
+              <MobileCardRow label="Status">
+                <span className="capitalize">{s.status}</span>
+              </MobileCardRow>
+            </MobileCard>
+          ))}
+        </div>
+        <Card className="hidden overflow-hidden md:block">
+          <TableScroll>
+            <table className="w-full min-w-[400px] text-left text-sm">
+              <thead className="bg-cream/50 text-xs uppercase text-stone-500">
+                <tr>
+                  <th className="px-4 py-2">#</th>
+                  <th className="px-4 py-2">Due</th>
+                  <th className="px-4 py-2">Amount</th>
+                  <th className="px-4 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(enrollment.payment_schedules ?? []).map((s) => (
+                  <tr key={s.id} className="border-t border-stone-100">
+                    <td className="px-4 py-2">{s.sequence}</td>
+                    <td className="px-4 py-2">{new Date(s.due_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-2">{formatNaira(s.amount_naira)}</td>
+                    <td className="px-4 py-2 capitalize">{s.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </TableScroll>
+        </Card>
+      </div>
     </div>
   );
 }

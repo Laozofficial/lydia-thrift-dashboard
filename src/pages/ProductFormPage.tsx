@@ -79,8 +79,17 @@ export function ProductFormPage() {
 
   return (
     <div>
-      <PageHeader title={isNew ? 'Add product' : 'Edit product'} action={<Link to="/products"><Button variant="outline">Back</Button></Link>} />
-      <Card className="max-w-2xl p-6">
+      <PageHeader
+        title={isNew ? 'Add product' : 'Edit product'}
+        action={
+          <Link to="/products" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full">
+              Back
+            </Button>
+          </Link>
+        }
+      />
+      <Card className="w-full max-w-2xl p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {error ? <Alert>{error}</Alert> : null}
           <div>
@@ -99,7 +108,7 @@ export function ProductFormPage() {
             <Label>Price (₦)</Label>
             <Input type="number" min="0.01" step="0.01" value={priceNaira} onChange={(e) => setPriceNaira(e.target.value)} required />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
               <Label>Daily installments</Label>
               <Input type="number" min="1" value={daily} onChange={(e) => setDaily(e.target.value)} required />
@@ -134,7 +143,9 @@ export function ProductFormPage() {
             <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
             Active in shop
           </label>
-          <Button type="submit">{isNew ? 'Create product' : 'Save changes'}</Button>
+          <Button type="submit" className="w-full sm:w-auto">
+            {isNew ? 'Create product' : 'Save changes'}
+          </Button>
         </form>
       </Card>
     </div>

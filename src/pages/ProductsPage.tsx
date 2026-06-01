@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { deleteProduct, listProducts, type ProductSort } from '../api/admin';
 import { formatNaira } from '../api/client';
 import type { Product } from '../api/types';
-import { Alert, Badge, Button, Card, Input, PageHeader } from '../components/ui';
+import { Alert, Badge, Button, Card, Input, PageHeader, Select } from '../components/ui';
 
 type LayoutMode = 'grid' | 'list';
 type ActiveFilter = 'all' | 'active' | 'inactive';
@@ -102,76 +102,72 @@ export function ProductsPage() {
     fetchPage(1, true);
   }
 
-  const selectClass =
-    'border border-stone-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand';
-
   return (
     <div>
       <PageHeader
         title="Products"
         subtitle={total > 0 ? `${products.length} of ${total} loaded` : 'Manage shop catalog'}
         action={
-          <Link to="/products/new">
-            <Button>Add product</Button>
+          <Link to="/products/new" className="w-full sm:w-auto">
+            <Button className="w-full">Add product</Button>
           </Link>
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Input
-          placeholder="Search products…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && applySearch()}
-          className="max-w-xs min-w-[200px] flex-1"
-        />
-        <Button variant="outline" onClick={applySearch}>
-          Search
-        </Button>
-
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as ProductSort)}
-          className={selectClass}
-          aria-label="Sort products"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as ActiveFilter)}
-          className={selectClass}
-          aria-label="Filter by status"
-        >
-          <option value="all">All status</option>
-          <option value="active">Active only</option>
-          <option value="inactive">Inactive only</option>
-        </select>
-
-        <div className="flex border border-stone-300 bg-white">
-          <button
-            type="button"
-            onClick={() => setLayout('grid')}
-            className={`border-r border-stone-300 px-3 py-2 text-sm font-medium transition ${
-              layout === 'grid' ? 'bg-brand text-white' : 'text-stone-600 hover:text-brand'
-            }`}
+      <div className="mb-4 space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            placeholder="Search products…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && applySearch()}
+            className="flex-1"
+          />
+          <Button variant="outline" onClick={applySearch} className="sm:min-w-[100px]">
+            Search
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <Select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as ProductSort)}
+            aria-label="Sort products"
           >
-            Grid
-          </button>
-          <button
-            type="button"
-            onClick={() => setLayout('list')}
-            className={`px-3 py-2 text-sm font-medium transition ${
-              layout === 'list' ? 'bg-brand text-white' : 'text-stone-600 hover:text-brand'
-            }`}
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </Select>
+          <Select
+            value={activeFilter}
+            onChange={(e) => setActiveFilter(e.target.value as ActiveFilter)}
+            aria-label="Filter by status"
           >
-            List
-          </button>
+            <option value="all">All status</option>
+            <option value="active">Active only</option>
+            <option value="inactive">Inactive only</option>
+          </Select>
+          <div className="flex border border-stone-300 bg-white">
+            <button
+              type="button"
+              onClick={() => setLayout('grid')}
+              className={`min-h-[44px] flex-1 border-r border-stone-300 px-3 py-2 text-sm font-medium transition ${
+                layout === 'grid' ? 'bg-brand text-white' : 'text-stone-600 hover:text-brand'
+              }`}
+            >
+              Grid
+            </button>
+            <button
+              type="button"
+              onClick={() => setLayout('list')}
+              className={`min-h-[44px] flex-1 px-3 py-2 text-sm font-medium transition ${
+                layout === 'list' ? 'bg-brand text-white' : 'text-stone-600 hover:text-brand'
+              }`}
+            >
+              List
+            </button>
+          </div>
         </div>
       </div>
 
@@ -183,7 +179,7 @@ export function ProductsPage() {
       ) : null}
 
       {layout === 'grid' ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} onDelete={handleDelete} />
           ))}
@@ -218,13 +214,13 @@ function ProductCard({ product: p, onDelete }: { product: Product; onDelete: (id
         </div>
         <p className="mt-1 text-sm font-bold text-brand">{formatNaira(p.price_naira)}</p>
         <p className="mt-2 line-clamp-2 text-xs text-stone-500">{p.description}</p>
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <Link to={`/products/${p.id}`} className="flex-1">
             <Button variant="outline" className="w-full">
               Edit
             </Button>
           </Link>
-          <Button variant="danger" onClick={() => onDelete(p.id)}>
+          <Button variant="danger" className="w-full sm:w-auto" onClick={() => onDelete(p.id)}>
             Delete
           </Button>
         </div>

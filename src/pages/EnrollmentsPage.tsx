@@ -5,7 +5,7 @@ import { listEnrollments, type EnrollmentFulfillment } from '../api/admin';
 import { formatNaira } from '../api/client';
 import type { Enrollment } from '../api/types';
 import { deliveryBadgeTone } from '../utils/delivery';
-import { Alert, Badge, Card, PageHeader } from '../components/ui';
+import { Alert, Badge, Card, MobileCard, MobileCardRow, PageHeader, TableScroll } from '../components/ui';
 
 const FULFILLMENT_TABS: { value: EnrollmentFulfillment | ''; label: string; hint: string }[] = [
   { value: '', label: 'All plans', hint: 'Every enrollment' },
@@ -53,13 +53,13 @@ export function EnrollmentsPage() {
     <div>
       <PageHeader title="Plans & shipping" subtitle="Track completed orders and deliveries" />
 
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1 snap-x snap-mandatory md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
         {FULFILLMENT_TABS.map((tab) => (
           <button
             key={tab.value || 'all'}
             type="button"
             onClick={() => setFulfillment(tab.value)}
-            className={`border px-4 py-2 text-left text-sm transition ${
+            className={`min-w-[140px] shrink-0 snap-start border px-3 py-2.5 text-left text-sm transition sm:min-w-[160px] md:min-w-0 md:flex-1 ${
               fulfillment === tab.value
                 ? 'border-brand bg-brand text-white'
                 : 'border-stone-300 bg-white text-stone-700 hover:border-brand'
@@ -76,62 +76,111 @@ export function EnrollmentsPage() {
       {error ? <Alert>{error}</Alert> : null}
       {loading ? <p className="text-stone-500">Loading…</p> : null}
 
-      <Card className="overflow-hidden">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-stone-200 bg-cream/50 text-xs uppercase text-stone-500">
-            <tr>
-              <th className="px-4 py-3">Customer</th>
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Plan</th>
-              <th className="px-4 py-3">Shipping</th>
-              <th className="px-4 py-3">Total</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {!loading && enrollments.length === 0 ? (
+      {/* Mobile cards */}
+      {!loading ? (
+        <div className="flex flex-col gap-3 md:hidden">
+          {enrollments.length === 0 ? (
+            <p className="py-12 text-center text-stone-500">No plans in this queue.</p>
+          ) : null}
+          {enrollments.map((e) => (
+            <EnrollmentMobileCard key={e.id} enrollment={e} />
+          ))}
+        </div>
+      ) : null}
+
+      {/* Desktop table */}
+      <Card className="hidden overflow-hidden md:block">
+        <TableScroll>
+          <table className="w-full min-w-[800px] text-left text-sm">
+            <thead className="border-b border-stone-200 bg-cream/50 text-xs uppercase text-stone-500">
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-stone-500">
-                  No plans in this queue.
-                </td>
+                <th className="px-4 py-3">Customer</th>
+                <th className="px-4 py-3">Product</th>
+                <th className="px-4 py-3">Plan</th>
+                <th className="px-4 py-3">Shipping</th>
+                <th className="px-4 py-3">Total</th>
+                <th className="px-4 py-3" />
               </tr>
-            ) : null}
-            {enrollments.map((e) => (
-              <tr key={e.id} className="border-b border-stone-100 hover:bg-cream/40">
-                <td className="px-4 py-3">
-                  <p className="font-medium">{e.user?.name ?? '—'}</p>
-                  <p className="text-xs text-stone-500">{e.user?.email}</p>
-                </td>
-                <td className="px-4 py-3">{e.product?.name}</td>
-                <td className="px-4 py-3">
-                  <Badge tone={e.status === 'active' ? 'success' : e.status === 'completed' ? 'neutral' : 'warning'}>
-                    {e.status}
-                  </Badge>
-                  {e.shipping?.completed_at ? (
-                    <p className="mt-1 text-xs text-stone-500">
-                      Completed {new Date(e.shipping.completed_at).toLocaleDateString()}
-                    </p>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3">
-                  <Badge tone={deliveryBadgeTone(e.delivery_status)}>
-                    {e.delivery_status_label ?? e.delivery_status ?? '—'}
-                  </Badge>
-                  {e.shipping?.tracking_number ? (
-                    <p className="mt-1 font-mono text-xs text-stone-600">{e.shipping.tracking_number}</p>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3">{formatNaira(e.total_naira)}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link to={`/enrollments/${e.id}`} className="font-semibold text-brand hover:underline">
-                    Manage
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {enrollments.length === 0 && !loading ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-stone-500">
+                    No plans in this queue.
+                  </td>
+                </tr>
+              ) : null}
+              {enrollments.map((e) => (
+                <tr key={e.id} className="border-b border-stone-100 hover:bg-cream/40">
+                  <td className="px-4 py-3">
+                    <p className="font-medium">{e.user?.name ?? '—'}</p>
+                    <p className="text-xs text-stone-500">{e.user?.email}</p>
+                  </td>
+                  <td className="px-4 py-3">{e.product?.name}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={e.status === 'active' ? 'success' : e.status === 'completed' ? 'neutral' : 'warning'}>
+                      {e.status}
+                    </Badge>
+                    {e.shipping?.completed_at ? (
+                      <p className="mt-1 text-xs text-stone-500">
+                        Completed {new Date(e.shipping.completed_at).toLocaleDateString()}
+                      </p>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge tone={deliveryBadgeTone(e.delivery_status)}>
+                      {e.delivery_status_label ?? e.delivery_status ?? '—'}
+                    </Badge>
+                    {e.shipping?.tracking_number ? (
+                      <p className="mt-1 font-mono text-xs text-stone-600">{e.shipping.tracking_number}</p>
+                    ) : null}
+                  </td>
+                  <td className="px-4 py-3">{formatNaira(e.total_naira)}</td>
+                  <td className="px-4 py-3 text-right">
+                    <Link to={`/enrollments/${e.id}`} className="font-semibold text-brand hover:underline">
+                      Manage
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
       </Card>
     </div>
+  );
+}
+
+function EnrollmentMobileCard({ enrollment: e }: { enrollment: Enrollment }) {
+  return (
+    <MobileCard>
+      <div className="mb-2">
+        <p className="font-semibold text-stone-900">{e.product?.name}</p>
+        <p className="text-xs text-stone-500">{e.user?.name}</p>
+        <p className="truncate text-xs text-stone-400">{e.user?.email}</p>
+      </div>
+      <MobileCardRow label="Plan status">
+        <Badge tone={e.status === 'active' ? 'success' : e.status === 'completed' ? 'neutral' : 'warning'}>
+          {e.status}
+        </Badge>
+      </MobileCardRow>
+      <MobileCardRow label="Shipping">
+        <Badge tone={deliveryBadgeTone(e.delivery_status)}>
+          {e.delivery_status_label ?? e.delivery_status ?? '—'}
+        </Badge>
+      </MobileCardRow>
+      {e.shipping?.tracking_number ? (
+        <MobileCardRow label="Tracking">
+          <span className="font-mono text-xs">{e.shipping.tracking_number}</span>
+        </MobileCardRow>
+      ) : null}
+      <MobileCardRow label="Total">{formatNaira(e.total_naira)}</MobileCardRow>
+      <Link
+        to={`/enrollments/${e.id}`}
+        className="mt-3 flex min-h-[44px] w-full items-center justify-center border border-brand text-sm font-semibold text-brand"
+      >
+        Manage shipping
+      </Link>
+    </MobileCard>
   );
 }

@@ -32,8 +32,8 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream-bg p-6">
-      <Card className="w-full max-w-md p-8">
+    <div className="flex min-h-screen min-h-[100dvh] items-center justify-center bg-cream-bg p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
+      <Card className="w-full max-w-md p-6 sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-widest text-brand">Lydia&apos;s Thrift</p>
         <h1 className="font-display mt-2 text-2xl font-bold">Admin sign in</h1>
         <p className="mt-1 text-sm text-stone-500">Manage products, users, plans, and payments.</p>

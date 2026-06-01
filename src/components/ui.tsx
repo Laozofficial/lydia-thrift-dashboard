@@ -1,13 +1,13 @@
-import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react';
 
 export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
   return (
-    <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <h1 className="font-display text-2xl font-bold text-stone-900">{title}</h1>
+    <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="font-display text-xl font-bold text-stone-900 sm:text-2xl">{title}</h1>
         {subtitle ? <p className="mt-1 text-sm text-stone-500">{subtitle}</p> : null}
       </div>
-      {action}
+      {action ? <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row">{action}</div> : null}
     </div>
   );
 }
@@ -24,7 +24,7 @@ export function Button({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'outline' | 'danger' }) {
   const base =
-    'inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50';
+    'inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2.5 text-sm font-semibold transition disabled:opacity-50 sm:w-auto';
   const styles = {
     primary: 'bg-brand text-white hover:bg-brand-dark',
     outline: 'border border-stone-300 text-stone-700 hover:border-brand hover:text-brand',
@@ -33,12 +33,18 @@ export function Button({
   return <button className={`${base} ${styles[variant]} ${className}`} {...props} />;
 }
 
+const fieldClass =
+  'w-full min-h-[44px] border border-stone-300 bg-white px-3 py-2.5 text-base outline-none focus:border-brand focus:ring-1 focus:ring-brand sm:text-sm';
+
 export function Input({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={`${fieldClass} ${className}`} {...props} />;
+}
+
+export function Select({ className = '', children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <input
-      className={`w-full border border-stone-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand ${className}`}
-      {...props}
-    />
+    <select className={`${fieldClass} ${className}`} {...props}>
+      {children}
+    </select>
   );
 }
 
@@ -67,13 +73,13 @@ export function PasswordInput({ className = '', ...props }: Omit<InputHTMLAttrib
     <div className="relative">
       <input
         type={visible ? 'text' : 'password'}
-        className={`w-full border border-stone-300 bg-white py-2.5 pl-3 pr-11 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand ${className}`}
+        className={`${fieldClass} pr-11 ${className}`}
         {...props}
       />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-500 hover:text-brand"
+        className="absolute right-2 top-1/2 flex min-h-[36px] min-w-[36px] -translate-y-1/2 items-center justify-center text-stone-500 hover:text-brand"
         aria-label={visible ? 'Hide password' : 'Show password'}
         tabIndex={-1}
       >
@@ -90,7 +96,7 @@ export function Label({ children }: { children: ReactNode }) {
 export function Textarea({ className = '', ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className={`w-full border border-stone-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand focus:ring-1 focus:ring-brand ${className}`}
+      className={`w-full border border-stone-300 bg-white px-3 py-2.5 text-base outline-none focus:border-brand focus:ring-1 focus:ring-brand sm:text-sm ${className}`}
       {...props}
     />
   );
@@ -111,5 +117,25 @@ export function Badge({ children, tone = 'neutral' }: { children: ReactNode; ton
   };
   return (
     <span className={`inline-flex border px-2.5 py-0.5 text-xs font-semibold capitalize ${tones[tone]}`}>{children}</span>
+  );
+}
+
+/** Horizontal scroll wrapper for wide tables on tablet */
+export function TableScroll({ children }: { children: ReactNode }) {
+  return <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">{children}</div>;
+}
+
+export function MobileCard({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`border border-stone-200 bg-white p-4 shadow-sm ${className}`}>{children}</div>
+  );
+}
+
+export function MobileCardRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-3 border-b border-stone-100 py-2.5 last:border-0">
+      <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-stone-400">{label}</span>
+      <div className="min-w-0 text-right text-sm text-stone-800">{children}</div>
+    </div>
   );
 }
